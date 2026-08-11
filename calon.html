@@ -1,11 +1,925 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Kontak Saya</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pencalonan &amp; Pemilihan Anggota PDM Kabupaten Malang</title>
+<style>
+  :root{
+    --hijau:#1F6F3F; --hijau-tua:#154d2b; --emas:#C99A2E;
+    --bg:#F5F7F5; --abu:#6b7280; --border:#e2e6e3;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);margin:0;color:#222;}
+  header.topbar{background:linear-gradient(120deg,var(--hijau-tua),var(--hijau));color:#fff;padding:20px 24px;}
+  header.topbar h1{margin:0 0 4px;font-size:19px;}
+  header.topbar p{margin:0;font-size:13px;opacity:.9;}
+  nav.tabs{display:flex;flex-wrap:wrap;gap:8px;background:#fff;padding:10px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;}
+  nav.tabs button{border:none;background:#eef5ef;color:var(--hijau-tua);font-size:13px;font-weight:600;padding:8px 14px;border-radius:20px;cursor:pointer;}
+  nav.tabs button.active{background:var(--hijau);color:#fff;}
+  .wrap{max-width:820px;margin:0 auto;padding:20px 16px 60px;}
+  .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+  .card h2{margin-top:0;font-size:17px;color:var(--hijau-tua);}
+  .banner{background:#fff4e5;border:1px solid #f2c98c;color:#8a5a00;font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:none;}
+  label{display:block;font-size:13px;font-weight:600;margin:14px 0 6px;color:#333;}
+  input[type=text],input[type=tel],input[type=email],input[type=password],textarea,select{
+    width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;font-family:inherit;}
+  textarea{min-height:80px;resize:vertical;}
+  button.btn{background:var(--hijau);color:#fff;border:none;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:16px;}
+  button.btn:hover{background:var(--hijau-tua);}
+  button.btn:disabled{background:#9ca3af;cursor:not-allowed;}
+  button.btn.secondary{background:#fff;color:var(--hijau-tua);border:1px solid var(--hijau);}
+  button.btn.small{padding:6px 12px;font-size:12px;margin:0 4px 0 0;}
+  button.btn.danger{background:#a02b2b;}
+  .msg{margin-top:14px;padding:12px 14px;border-radius:8px;font-size:14px;display:none;}
+  .msg.ok{background:#e6f4ea;color:#1e6b34;display:block;}
+  .msg.err{background:#fdecea;color:#a02b2b;display:block;}
+  .candidate{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer;}
+  .candidate:hover{border-color:var(--hijau);}
+  .candidate.selected{border-color:var(--hijau);background:#f1f9f2;}
+  .candidate input{width:18px;height:18px;margin-top:2px;}
+  .candidate .info b{font-size:14px;}
+  .candidate .info div.sub{font-size:12px;color:var(--abu);margin-top:2px;}
+  .badge{display:inline-block;background:var(--emas);color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:6px;}
+  .counter{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);padding:12px 16px;text-align:center;font-size:13px;}
+  table.result{width:100%;border-collapse:collapse;font-size:13px;}
+  table.result th,table.result td{border-bottom:1px solid var(--border);padding:8px 6px;text-align:left;}
+  table.result th{color:var(--hijau-tua);font-size:12px;}
+  table.result tr:first-child td{font-weight:700;color:var(--emas);}
+  table.result td{vertical-align:top;}
+  table.result input[type=text],table.result textarea{width:100%;padding:6px 8px;font-size:12.5px;border:1px solid #d1d5db;border-radius:6px;font-family:inherit;margin:0;}
+  table.result textarea{min-height:40px;resize:vertical;}
+  td.chk-cell{text-align:center;}
+  td.chk-cell input[type=checkbox]{width:18px;height:18px;}
+  button.btn.icon{background:none;border:none;color:#a02b2b;font-size:15px;cursor:pointer;padding:4px 6px;line-height:1;}
+  button.btn.icon:hover{color:#6e1c1c;}
+  .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px;}
+  .stat{background:#f1f9f2;border-radius:10px;padding:14px;text-align:center;}
+  .stat b{display:block;font-size:22px;color:var(--hijau-tua);}
+  .stat span{font-size:12px;color:var(--abu);}
+  .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .menu-item{display:block;background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 14px;text-align:center;color:var(--hijau-tua);font-weight:600;cursor:pointer;}
+  .menu-item:hover{border-color:var(--hijau);}
+  .menu-item .ico{font-size:26px;display:block;margin-bottom:8px;}
+  .usulan-item{border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;font-size:13px;}
+  .usulan-item .status{font-size:11px;padding:2px 8px;border-radius:10px;background:#eee;margin-left:6px;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .login-sec{display:none;}
+  .identity-box{background:#f1f9f2;border-radius:10px;padding:14px;margin-bottom:14px;font-size:13px;}
+  .identity-box b{font-size:14px;}
+  .identity-box .sub{color:var(--abu);margin-top:4px;}
+  footer.foot{text-align:center;font-size:12px;color:var(--abu);padding:20px;}
+  @media (max-width:480px){.menu-grid{grid-template-columns:1fr;}.stat-grid{grid-template-columns:1fr;}}
+</style>
 </head>
 <body>
-    <h1>Hubungi Saya</h1>
-    <p>Ini adalah halaman kontak baru.</p>
+
+<script>
+/* =====================================================================
+ * KONFIGURASI — isi SCRIPT_URL dengan URL Web App Apps Script Anda.
+ * Selama masih kosong, aplikasi berjalan dengan DATA CONTOH.
+ * ===================================================================== */
+var CONFIG = {
+  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbz_ODsyL2tLhZk_BLB7n-sxHLf_N1rgYXDobkHouXeJUb63OM7zkcFPWiGV_LVi1y-c/exec",
+  AUTO_REFRESH_MINUTES: 5
+};
+</script>
+
+<header class="topbar">
+  <h1>Pencalonan &amp; Pemilihan Anggota PDM</h1>
+  <p>Pimpinan Daerah Muhammadiyah Kabupaten Malang &middot; Jawa Timur</p>
+</header>
+
+<nav class="tabs">
+  <button data-page="home" class="active">Beranda</button>
+  <button data-page="login">Login</button>
+  <button data-page="pencalonan">Pencalonan</button>
+  <button data-page="pemilihan">Pemilihan</button>
+  <button data-page="hasil">Hasil</button>
+  <button data-page="admin">Panitia</button>
+</nav>
+
+<div class="wrap">
+  <div class="banner" id="demoBanner">
+    ⚠️ Mode <b>data contoh</b> — aplikasi belum tersambung ke spreadsheet. Isi <code>CONFIG.SCRIPT_URL</code>
+    di bagian atas file ini dengan URL Web App Apps Script Anda (lihat PANDUAN_SETUP.md). Contoh akun untuk dicoba:
+    Admin PDM (email &amp; password bebas), Pemilih/Utusan token <b>PDM-001</b>, Anggota PDM token <b>ANG-001</b>,
+    Ketua PCM token <b>PCM-001</b>, ORTOM ('Aisyiyah) token <b>ORT-001</b>.
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <div class="page active" id="page-home">
+    <div class="card">
+      <h2>Selamat Datang</h2>
+      <p style="font-size:14px;color:#555;line-height:1.6;">
+        Aplikasi ini digunakan untuk proses <b>pencalonan</b> dan <b>pemilihan</b> Anggota
+        Pimpinan Daerah Muhammadiyah (PDM) Kabupaten Malang pada Musyawarah Daerah (Musyda).
+      </p>
+      <div class="menu-grid">
+        <div class="menu-item" data-page="login"><span class="ico">🔑</span>Login</div>
+        <div class="menu-item" data-page="pencalonan"><span class="ico">📝</span>Formulir Pencalonan</div>
+        <div class="menu-item" data-page="pemilihan"><span class="ico">🗳️</span>Pemilihan / Voting</div>
+        <div class="menu-item" data-page="hasil"><span class="ico">📊</span>Hasil Perolehan Suara</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Statistik</h2>
+      <div class="stat-grid" id="hm_statGrid">
+        <div class="stat"><b>-</b><span>Usulan Calon Masuk</span></div>
+        <div class="stat"><b>-</b><span>Kandidat Terverifikasi</span></div>
+        <div class="stat"><b>-</b><span>Total Pemilih Terdaftar</span></div>
+        <div class="stat"><b>-</b><span>Sudah Memilih</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Informasi Musyda Muhammadiyah Kabupaten Malang</h2>
+      <div id="infoBody" style="font-size:13px;color:#555;">Memuat...</div>
+    </div>
+  </div>
+
+  <!-- ============ LOGIN ============ -->
+  <div class="page" id="page-login">
+    <div class="card" id="lg_roleGrid">
+      <h2>Silakan Pilih Peran Anda</h2>
+      <p style="font-size:13px;color:#666;margin-top:-8px;">Pilih salah satu peran di bawah untuk login.</p>
+      <div class="menu-grid">
+        <div class="menu-item" data-role="admin"><span class="ico">🛡️</span>Admin PDM</div>
+        <div class="menu-item" data-role="anggotapdm"><span class="ico">👤</span>Anggota PDM</div>
+        <div class="menu-item" data-role="ketuapcm"><span class="ico">🏛️</span>Ketua PCM</div>
+        <div class="menu-item" data-role="ortom"><span class="ico">🤝</span>ORTOM</div>
+        <div class="menu-item" data-role="kandidat"><span class="ico">🎖️</span>Kandidat / Calon</div>
+        <div class="menu-item" data-role="pemilih"><span class="ico">🗳️</span>Pemilih / Utusan</div>
+      </div>
+    </div>
+
+    <!-- ADMIN PDM -->
+    <div class="card login-sec" id="lg_sec_admin">
+      <button type="button" class="btn secondary small" data-back>← Pilih Peran Lain</button>
+      <h2 style="margin-top:12px;">Login Admin PDM</h2>
+      <label>Email</label><input type="email" id="ad_email">
+      <label>Password</label><input type="password" id="ad_password">
+      <button class="btn" id="ad_btnLogin">Masuk</button>
+      <div class="msg" id="ad_msgLogin"></div>
+    </div>
+
+    <!-- ANGGOTA PDM -->
+    <div class="card login-sec" id="lg_sec_anggotapdm">
+      <button type="button" class="btn secondary small" data-back>← Pilih Peran Lain</button>
+      <h2 style="margin-top:12px;">Login Anggota PDM</h2>
+      <p style="font-size:13px;color:#666;">Masukkan Token Akses yang diberikan panitia. Setelah login, Anda akan diarahkan ke Formulir Pencalonan.</p>
+      <label>Token Akses</label><input type="text" id="lg_tokenAnggotaPdm" style="text-transform:uppercase;">
+      <button class="btn" data-loginpengusul="Anggota PDM" data-tokenid="lg_tokenAnggotaPdm" data-msgid="lg_msgAnggotaPdm">Masuk</button>
+      <div class="msg" id="lg_msgAnggotaPdm"></div>
+    </div>
+
+    <!-- KETUA PCM -->
+    <div class="card login-sec" id="lg_sec_ketuapcm">
+      <button type="button" class="btn secondary small" data-back>← Pilih Peran Lain</button>
+      <h2 style="margin-top:12px;">Login Ketua PCM</h2>
+      <p style="font-size:13px;color:#666;">Masukkan Token Akses yang diberikan panitia. Setelah login, Anda akan diarahkan ke Formulir Pencalonan.</p>
+      <label>Token Akses</label><input type="text" id="lg_tokenKetuaPcm" style="text-transform:uppercase;">
+      <button class="btn" data-loginpengusul="Ketua PCM" data-tokenid="lg_tokenKetuaPcm" data-msgid="lg_msgKetuaPcm">Masuk</button>
+      <div class="msg" id="lg_msgKetuaPcm"></div>
+    </div>
+
+    <!-- ORTOM -->
+    <div class="card login-sec" id="lg_sec_ortom">
+      <button type="button" class="btn secondary small" data-back>← Pilih Peran Lain</button>
+      <h2 style="margin-top:12px;">Login ORTOM</h2>
+      <p style="font-size:13px;color:#666;">Pilih organisasi otonom Anda, lalu masukkan Token Akses dari panitia.</p>
+      <label>Pilih ORTOM *</label>
+      <select id="lg_ortomPilih">
+        <option value="">-- pilih ORTOM --</option>
+        <option>'Aisyiyah</option>
+        <option>Pemuda Muhammadiyah</option>
+        <option>Nasyiatul 'Aisyiyah</option>
+        <option>Hizbul Wathan</option>
+        <option>Tapak Suci</option>
+        <option>IPM</option>
+        <option>IMM</option>
+      </select>
+      <label>Token Akses</label><input type="text" id="lg_tokenOrtom" style="text-transform:uppercase;">
+      <button class="btn" id="lg_btnLoginOrtom">Masuk</button>
+      <div class="msg" id="lg_msgOrtom"></div>
+    </div>
+
+    <!-- KANDIDAT / CALON -->
+    <div class="card login-sec" id="lg_sec_kandidat">
+      <button type="button" class="btn secondary small" data-back>← Pilih Peran Lain</button>
+      <h2 style="margin-top:12px;">Cek Status Kandidat / Calon</h2>
+      <p style="font-size:13px;color:#666;">Masukkan NBM dan Nama Lengkap sesuai data yang diusulkan untuk melihat status verifikasi Anda.</p>
+      <label>NBM *</label><input type="text" id="lg_kandidatNbm">
+      <label>Nama Lengkap *</label><input type="text" id="lg_kandidatNama">
+      <button class="btn" id="lg_btnCekKandidat">Cek Status</button>
+      <div class="msg" id="lg_msgKandidat"></div>
+      <div id="lg_kandidatResult" style="display:none;margin-top:14px;"></div>
+    </div>
+
+    <!-- PEMILIH / UTUSAN -->
+    <div class="card login-sec" id="lg_sec_pemilih">
+      <button type="button" class="btn secondary small" data-back>← Pilih Peran Lain</button>
+      <h2 style="margin-top:12px;">Login Pemilih / Utusan</h2>
+      <p style="font-size:13px;color:#666;">Masukkan token akses yang diberikan panitia saat registrasi Musyda. Setelah login, Anda akan diarahkan ke halaman Pemilihan.</p>
+      <label>Token Akses</label><input type="text" id="lg_tokenPemilih" style="text-transform:uppercase;">
+      <button class="btn" id="lg_btnLoginPemilih">Masuk</button>
+      <div class="msg" id="lg_msgPemilih"></div>
+    </div>
+  </div>
+
+  <!-- ============ PENCALONAN ============ -->
+  <div class="page" id="page-pencalonan">
+    <div class="card" id="pc_gate">
+      <h2>Login Diperlukan</h2>
+      <p style="font-size:13px;color:#555;line-height:1.6;">
+        Formulir Pencalonan hanya dapat diakses oleh <b>Anggota PDM</b>, <b>Ketua PCM</b>, atau <b>ORTOM</b>
+        ('Aisyiyah, Pemuda Muhammadiyah, Nasyiatul 'Aisyiyah, Hizbul Wathan, Tapak Suci, IPM, IMM) yang sudah login
+        menggunakan Token Akses dari panitia.
+      </p>
+      <button class="btn" data-page="login">Ke Halaman Login</button>
+    </div>
+    <div class="card" id="pencalonanClosed" style="display:none;">
+      <h2>Pendaftaran Ditutup</h2>
+      <p>Mohon maaf, masa pencalonan saat ini sudah ditutup oleh panitia.</p>
+    </div>
+    <div class="card" id="pencalonanForm" style="display:none;">
+      <h2>Ajukan Bakal Calon</h2>
+      <div class="identity-box" id="pc_identityBox">
+        <b id="pc_idNama"></b> <span class="badge" id="pc_idKategori"></span>
+        <div class="sub">Asal: <span id="pc_idAsal"></span> &middot; No HP: <span id="pc_idHp"></span></div>
+        <button type="button" class="btn secondary small" id="pc_btnLogout" style="margin-top:10px;">Keluar / Ganti Akun</button>
+      </div>
+      <p style="font-size:13px;color:#666;">Formulir ini digunakan untuk mengusulkan bakal calon Anggota PDM.</p>
+
+      <hr style="margin:20px 0;border:none;border-top:1px dashed var(--border);">
+
+      <label style="margin-bottom:2px;">Nama Calon yang Diusulkan *</label>
+      <p style="font-size:12px;color:#888;margin:0 0 10px;">
+        Pilih Nama Calon dari daftar (NBM &amp; Asal PCM/Ranting akan terisi otomatis dari sheet "Kandidat"), atau ketik nama baru jika calon belum pernah tercatat.
+        Kolom Riwayat Organisasi / Alasan Pengusulan tetap diisi sendiri oleh Pengusul.
+        Centang kotak "Pilih" di kolom paling kanan untuk menyertakan baris; jika sudah tercentang <b id="pc_maksInfo">13</b> calon, kotak ceklis lainnya otomatis nonaktif.
+      </p>
+      <datalist id="pc_kandidatList"></datalist>
+
+      <div style="overflow-x:auto;">
+        <table class="result" id="pc_calonTable">
+          <thead>
+            <tr>
+              <th style="min-width:140px;">Nama Calon</th>
+              <th style="min-width:90px;">NBM Calon</th>
+              <th style="min-width:140px;">Asal PCM/Ranting Calon</th>
+              <th style="min-width:180px;">Riwayat Organisasi / Alasan Pengusulan</th>
+              <th style="text-align:center;">Pilih</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="pc_calonTbody"></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn secondary small" id="pc_btnTambahKandidat" style="margin-top:8px;">+ Tambah Kandidat</button>
+
+      <div class="counter" style="position:static;border:1px solid var(--border);border-radius:8px;margin-top:14px;">
+        Tercentang: <b id="pc_jumlahTerpilih">0</b> / <span id="pc_maksBar">13</span>
+      </div>
+
+      <button class="btn" id="pc_btn" style="margin-top:16px;" disabled>Kirim Usulan</button>
+      <div class="msg" id="pc_msg"></div>
+    </div>
+  </div>
+
+  <!-- ============ PEMILIHAN ============ -->
+  <div class="page" id="page-pemilihan">
+    <div class="card" id="pm_tokenCard">
+      <h2>Verifikasi Token Pemilih</h2>
+      <p style="font-size:13px;color:#666;">Masukkan token akses yang diberikan panitia saat registrasi Musyda, atau login lewat halaman Login. (Data contoh: <b>PDM-001</b>)</p>
+      <label>Token Akses</label><input type="text" id="pm_token" style="text-transform:uppercase;">
+      <button class="btn" id="pm_btnCek">Verifikasi</button>
+      <div class="msg" id="pm_msgToken"></div>
+    </div>
+    <div class="card" id="pm_voteCard" style="display:none;">
+      <h2>Pilih Calon</h2>
+      <p style="font-size:13px;color:#666;">Pemilih: <b id="pm_nama"></b> &middot; Utusan: <b id="pm_asal"></b><br>Pilih maksimal <b id="pm_maksInfo"></b> calon.</p>
+      <div id="pm_list"></div>
+      <button class="btn" id="pm_btnKirim" disabled>Kirim Suara</button>
+      <div class="msg" id="pm_msgVote"></div>
+    </div>
+    <div class="counter" id="pm_counterBar" style="display:none;">Terpilih: <b id="pm_jumlah">0</b> / <span id="pm_maksBar"></span></div>
+  </div>
+
+  <!-- ============ HASIL ============ -->
+  <div class="page" id="page-hasil">
+    <div class="card">
+      <h2>Rekap Suara <span id="hs_badge" class="badge" style="display:none;"></span></h2>
+      <p style="font-size:12px;color:#888;">Data diperbarui otomatis. Klik tombol untuk memuat ulang.</p>
+      <button class="btn secondary" id="hs_reload">🔄 Muat Ulang</button>
+      <div style="overflow-x:auto;margin-top:14px;">
+        <table class="result">
+          <thead><tr><th>Peringkat</th><th>Nama Calon</th><th>Asal PCM</th><th>Suara</th></tr></thead>
+          <tbody id="hs_tbody"><tr><td colspan="4" style="text-align:center;color:#888;">Memuat...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ADMIN (PANITIA) ============ -->
+  <div class="page" id="page-admin">
+    <div class="card" id="ad_gate">
+      <h2>Panel Panitia</h2>
+      <p style="font-size:13px;color:#555;line-height:1.6;">Halaman ini khusus untuk <b>Admin PDM</b>. Silakan login terlebih dahulu melalui halaman Login.</p>
+      <button class="btn" data-page="login">Ke Halaman Login</button>
+    </div>
+
+    <div id="ad_panel" style="display:none;">
+      <div class="card">
+        <h2>Ringkasan</h2>
+        <div class="stat-grid" id="ad_statGrid">
+          <div class="stat"><b>-</b><span>Kandidat Terverifikasi</span></div>
+          <div class="stat"><b>-</b><span>Total Pemilih Terdaftar</span></div>
+          <div class="stat"><b>-</b><span>Sudah Memilih</span></div>
+          <div class="stat"><b>-</b><span>Usulan Calon Masuk</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Kontrol Status</h2>
+        <label>Status Pencalonan</label>
+        <select id="ad_selPencalonan"><option value="BUKA">BUKA</option><option value="TUTUP">TUTUP</option></select>
+        <button class="btn secondary small" id="ad_simpanPencalonan">Simpan</button>
+        <label style="margin-top:18px;">Status Pemilihan</label>
+        <select id="ad_selPemilihan"><option value="BUKA">BUKA</option><option value="TUTUP">TUTUP</option></select>
+        <button class="btn secondary small" id="ad_simpanPemilihan">Simpan</button>
+        <div class="msg" id="ad_msgStatus"></div>
+      </div>
+      <div class="card">
+        <h2>Verifikasi Usulan Calon</h2>
+        <div id="ad_listUsulan"><p style="font-size:13px;color:#888;">Memuat...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">&copy; <span id="year"></span> Panitia Musyda Muhammadiyah Kabupaten Malang</footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+var DEMO_MODE = !CONFIG.SCRIPT_URL || CONFIG.SCRIPT_URL.indexOf('PASTE_URL') !== -1;
+if (DEMO_MODE) document.getElementById('demoBanner').style.display = 'block';
+
+/* ---------- DATA CONTOH ---------- */
+var DEMO = {
+  pengaturan: {
+    periode: '2027-2032', tanggal: '2026-12-01',
+    statusPencalonan: 'BUKA', statusPemilihan: 'BUKA',
+    maksPilihan: 3, jumlahDipilih: 3
+  },
+  kandidat: [
+    { id: 'KAND-1', nbm: '111111', nama: 'H. Ahmad Fulan, S.Ag.', asalPcm: 'PCM Kepanjen', riwayat: 'Ketua PCM Kepanjen 2015-2022' },
+    { id: 'KAND-2', nbm: '222222', nama: 'Dra. Hj. Siti Aminah', asalPcm: 'PCM Turen', riwayat: 'Ketua Aisyiyah Turen' },
+    { id: 'KAND-3', nbm: '333333', nama: 'Drs. Bambang Wijaya', asalPcm: 'PCM Singosari', riwayat: 'Sekretaris PDM 2 periode' }
+  ],
+  hasil: [
+    { nama: 'H. Ahmad Fulan, S.Ag.', asalPcm: 'PCM Kepanjen', suara: 12 },
+    { nama: 'Drs. Bambang Wijaya', asalPcm: 'PCM Singosari', suara: 9 },
+    { nama: 'Dra. Hj. Siti Aminah', asalPcm: 'PCM Turen', suara: 7 }
+  ],
+  tokenValid: { 'PDM-001': { nama: 'Drs. Slamet Riyadi', asalPcm: 'PCM Turen' } },
+  pengusulValid: {
+    'ANG-001': { nama: 'Ust. Rahmat', kategori: 'Anggota PDM', asalPcmOrtom: 'PDM Kab. Malang', hp: '081234567890' },
+    'PCM-001': { nama: 'Drs. Bambang', kategori: 'Ketua PCM', asalPcmOrtom: 'PCM Bululawang', hp: '081234567891' },
+    'ORT-001': { nama: 'Hj. Nur Aini', kategori: "'Aisyiyah", asalPcmOrtom: 'PDA Kab. Malang', hp: '081234567892' }
+  },
+  usulan: [
+    { id: 'PENC-1', namaPengusul: 'Ust. Rahmat', kategoriPengusul: 'Anggota PDM', asalPcmOrtomPengusul: 'PDM Kab. Malang', namaCalon: 'H. Yusuf Hidayat', asalPcmCalon: 'PCM Bululawang', alasan: 'Aktif di dakwah dan pendidikan.', status: 'Baru' }
+  ]
+};
+
+/* ---------- HTTP HELPER ---------- */
+function apiGet(action, params) {
+  if (DEMO_MODE) return Promise.reject('DEMO');
+  var qs = new URLSearchParams(Object.assign({ action: action }, params || {})).toString();
+  return fetch(CONFIG.SCRIPT_URL + '?' + qs).then(function(r){ return r.json(); });
+}
+function apiPost(action, data) {
+  if (DEMO_MODE) return Promise.reject('DEMO');
+  return fetch(CONFIG.SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // hindari CORS preflight
+    body: JSON.stringify(Object.assign({ action: action }, data))
+  }).then(function(r){ return r.json(); });
+}
+
+/* ---------- NAVIGASI ---------- */
+function goPage(name) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('nav.tabs button').forEach(function(b){
+    b.classList.toggle('active', b.dataset.page === name);
+  });
+  if (name === 'home') loadHome();
+  if (name === 'login') lgShowGrid();
+  if (name === 'pencalonan') loadPencalonan();
+  if (name === 'pemilihan') { /* kartu ditentukan oleh status pemilihData, lihat applyPemilihSession */ }
+  if (name === 'hasil') loadHasil();
+  if (name === 'admin') {
+    if (adminToken) {
+      document.getElementById('ad_gate').style.display = 'none';
+      document.getElementById('ad_panel').style.display = 'block';
+      loadAdminPanel();
+    } else {
+      document.getElementById('ad_gate').style.display = 'block';
+      document.getElementById('ad_panel').style.display = 'none';
+    }
+  }
+}
+document.querySelectorAll('[data-page]').forEach(function(el){
+  el.addEventListener('click', function(){ goPage(el.dataset.page); });
+});
+
+function showMsg(id, text, ok) {
+  var el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+
+/* ---------- HOME ---------- */
+function loadHome() {
+  var render = function(cfg) {
+    document.getElementById('infoBody').innerHTML =
+      '<b>Periode:</b> ' + (cfg.periode || '-') + '<br>' +
+      '<b>Tanggal Musyda:</b> ' + (cfg.tanggal || '-') + '<br>' +
+      '<b>Status Pencalonan:</b> ' + (cfg.statusPencalonan === 'BUKA' ? '🟢 Dibuka' : '🔴 Ditutup') + '<br>' +
+      '<b>Status Pemilihan:</b> ' + (cfg.statusPemilihan === 'BUKA' ? '🟢 Dibuka' : '🔴 Ditutup');
+  };
+  apiGet('pengaturan').then(function(res){ render(res.data); }).catch(function(){ render(DEMO.pengaturan); });
+
+  var renderStat = function(s) {
+    var g = document.getElementById('hm_statGrid');
+    g.children[0].querySelector('b').textContent = s.usulanMasuk;
+    g.children[1].querySelector('b').textContent = s.kandidatTerverifikasi;
+    g.children[2].querySelector('b').textContent = s.totalPemilih;
+    g.children[3].querySelector('b').textContent = s.sudahMemilih;
+  };
+  apiGet('statistikPublik').then(function(res){ renderStat(res.data); })
+    .catch(function(){
+      renderStat({
+        usulanMasuk: DEMO.usulan.length,
+        kandidatTerverifikasi: DEMO.kandidat.length,
+        totalPemilih: 1,
+        sudahMemilih: 0
+      });
+    });
+}
+loadHome();
+
+/* ---------- LOGIN (HUB PERAN) ---------- */
+function lgShowGrid() {
+  document.getElementById('lg_roleGrid').style.display = 'block';
+  document.querySelectorAll('.login-sec').forEach(function(s){ s.style.display = 'none'; });
+}
+function lgShowRole(role) {
+  document.getElementById('lg_roleGrid').style.display = 'none';
+  document.querySelectorAll('.login-sec').forEach(function(s){ s.style.display = 'none'; });
+  var sec = document.getElementById('lg_sec_' + role);
+  if (sec) sec.style.display = 'block';
+}
+document.querySelectorAll('#lg_roleGrid [data-role]').forEach(function(el){
+  el.addEventListener('click', function(){ lgShowRole(el.dataset.role); });
+});
+document.querySelectorAll('.login-sec [data-back]').forEach(function(el){
+  el.addEventListener('click', lgShowGrid);
+});
+
+/* Sesi aktif (disimpan di memori, hilang saat halaman di-refresh) */
+var adminToken = null;
+var pengusulSession = null;
+var pemilihData = null;
+
+/* ---- Login Admin PDM ---- */
+document.getElementById('ad_btnLogin').addEventListener('click', function() {
+  var email = document.getElementById('ad_email').value.trim();
+  var password = document.getElementById('ad_password').value.trim();
+  if (!email || !password) { showMsg('ad_msgLogin', 'Email dan password wajib diisi.', false); return; }
+  var btn = document.getElementById('ad_btnLogin');
+  btn.disabled = true; btn.textContent = 'Memeriksa...';
+
+  var done = function(res) {
+    btn.disabled = false; btn.textContent = 'Masuk';
+    if (!res.ok) { showMsg('ad_msgLogin', res.message, false); return; }
+    adminToken = res.token || 'DEMO-TOKEN';
+    goPage('admin');
+  };
+  apiPost('adminLogin', { email: email, password: password }).then(done)
+    .catch(function(){ done({ ok: true, token: 'DEMO-TOKEN', nama: 'Admin (contoh)' }); });
+});
+
+/* ---- Login Anggota PDM / Ketua PCM / ORTOM (Formulir Pencalonan) ---- */
+function pengusulLogin(kategori, token, msgId, onSuccess) {
+  if (!token) { showMsg(msgId, 'Token wajib diisi.', false); return; }
+  apiPost('loginPengusul', { token: token, kategori: kategori }).then(function(res) {
+    if (!res.ok) { showMsg(msgId, res.message, false); return; }
+    pengusulSession = { token: token, nama: res.nama, kategori: res.kategori, asalPcmOrtom: res.asalPcmOrtom, hp: res.hp };
+    onSuccess();
+  }).catch(function() {
+    var d = DEMO.pengusulValid[token];
+    if (!d || d.kategori !== kategori) { showMsg(msgId, '[Mode contoh] Token tidak ditemukan untuk kategori ini.', false); return; }
+    pengusulSession = { token: token, nama: d.nama, kategori: d.kategori, asalPcmOrtom: d.asalPcmOrtom, hp: d.hp };
+    onSuccess();
+  });
+}
+document.querySelectorAll('[data-loginpengusul]').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var kategori = btn.dataset.loginpengusul;
+    var token = document.getElementById(btn.dataset.tokenid).value.trim().toUpperCase();
+    var msgId = btn.dataset.msgid;
+    pengusulLogin(kategori, token, msgId, function(){ goPage('pencalonan'); });
+  });
+});
+document.getElementById('lg_btnLoginOrtom').addEventListener('click', function() {
+  var kategori = document.getElementById('lg_ortomPilih').value;
+  if (!kategori) { showMsg('lg_msgOrtom', 'Pilih ORTOM terlebih dahulu.', false); return; }
+  var token = document.getElementById('lg_tokenOrtom').value.trim().toUpperCase();
+  pengusulLogin(kategori, token, 'lg_msgOrtom', function(){ goPage('pencalonan'); });
+});
+
+/* ---- Cek Status Kandidat / Calon ---- */
+document.getElementById('lg_btnCekKandidat').addEventListener('click', function() {
+  var nbm = document.getElementById('lg_kandidatNbm').value.trim();
+  var nama = document.getElementById('lg_kandidatNama').value.trim();
+  if (!nbm || !nama) { showMsg('lg_msgKandidat', 'NBM dan Nama Lengkap wajib diisi.', false); return; }
+
+  var render = function(res) {
+    var box = document.getElementById('lg_kandidatResult');
+    if (!res.ok) {
+      showMsg('lg_msgKandidat', res.message, false);
+      box.style.display = 'none';
+      return;
+    }
+    document.getElementById('lg_msgKandidat').className = 'msg';
+    var k = res.data;
+    var terverifikasi = String(k.statusVerifikasi).toLowerCase() === 'terverifikasi';
+    box.style.display = 'block';
+    box.innerHTML =
+      '<div class="identity-box"><b>' + k.nama + '</b> <span class="badge" style="background:' + (terverifikasi ? 'var(--hijau)' : 'var(--emas)') + ';">' + k.statusVerifikasi + '</span>' +
+      '<div class="sub">NBM: ' + k.nbm + ' &middot; Asal: ' + (k.asalPcm || '-') + '</div>' +
+      (k.riwayat ? '<div class="sub" style="margin-top:6px;">' + k.riwayat + '</div>' : '') +
+      '</div>';
+  };
+  apiPost('loginKandidat', { nbm: nbm, nama: nama }).then(render).catch(function() {
+    var found = (DEMO.kandidat || []).find(function(k) {
+      return String(k.nbm) === nbm && k.nama.toLowerCase().indexOf(nama.toLowerCase()) !== -1;
+    });
+    if (!found) { render({ ok: false, message: '[Mode contoh] Data tidak ditemukan. Coba NBM 111111.' }); return; }
+    render({ ok: true, data: Object.assign({ statusVerifikasi: 'Terverifikasi' }, found) });
+  });
+});
+
+/* ---- Login Pemilih / Utusan ---- */
+function verifikasiPemilihToken(token) {
+  return apiGet('cekToken', { token: token }).catch(function() {
+    var d = DEMO.tokenValid[token];
+    if (!d) return Promise.reject('DEMO_NOTFOUND');
+    return Promise.resolve({ ok: true, nama: d.nama, asalPcm: d.asalPcm, maksPilihan: DEMO.pengaturan.maksPilihan });
+  });
+}
+function applyPemilihSession(token, res) {
+  pemilihData = res; pemilihData.token = token;
+  document.getElementById('pm_nama').textContent = res.nama;
+  document.getElementById('pm_asal').textContent = res.asalPcm;
+  document.getElementById('pm_maksInfo').textContent = res.maksPilihan;
+  document.getElementById('pm_maksBar').textContent = res.maksPilihan;
+  document.getElementById('pm_tokenCard').style.display = 'none';
+  document.getElementById('pm_voteCard').style.display = 'block';
+  document.getElementById('pm_counterBar').style.display = 'block';
+  muatKandidat();
+}
+document.getElementById('lg_btnLoginPemilih').addEventListener('click', function() {
+  var token = document.getElementById('lg_tokenPemilih').value.trim().toUpperCase();
+  if (!token) { showMsg('lg_msgPemilih', 'Token wajib diisi.', false); return; }
+  var btn = this;
+  btn.disabled = true; btn.textContent = 'Memeriksa...';
+  verifikasiPemilihToken(token).then(function(res) {
+    btn.disabled = false; btn.textContent = 'Masuk';
+    if (!res.ok) { showMsg('lg_msgPemilih', res.message, false); return; }
+    applyPemilihSession(token, res);
+    goPage('pemilihan');
+  }).catch(function() {
+    btn.disabled = false; btn.textContent = 'Masuk';
+    showMsg('lg_msgPemilih', '[Mode contoh] Token tidak ditemukan. Coba: PDM-001', false);
+  });
+});
+
+/* ---------- PENCALONAN ---------- */
+var pcCfg = { jumlahDipilih: 13 };
+var pcDaftarKandidat = [];
+var pcKandidatMap = {};
+var pcRowSeq = 0;
+
+function loadPencalonan() {
+  if (!pengusulSession) {
+    document.getElementById('pc_gate').style.display = 'block';
+    document.getElementById('pencalonanClosed').style.display = 'none';
+    document.getElementById('pencalonanForm').style.display = 'none';
+    return;
+  }
+  document.getElementById('pc_gate').style.display = 'none';
+  document.getElementById('pc_idNama').textContent = pengusulSession.nama;
+  document.getElementById('pc_idKategori').textContent = pengusulSession.kategori;
+  document.getElementById('pc_idAsal').textContent = pengusulSession.asalPcmOrtom || '-';
+  document.getElementById('pc_idHp').textContent = pengusulSession.hp || '-';
+
+  var apply = function(cfg) {
+    var closed = cfg.statusPencalonan !== 'BUKA';
+    document.getElementById('pencalonanClosed').style.display = closed ? 'block' : 'none';
+    document.getElementById('pencalonanForm').style.display = closed ? 'none' : 'block';
+    pcCfg.jumlahDipilih = Number(cfg.jumlahDipilih) || 13;
+    document.getElementById('pc_maksInfo').textContent = pcCfg.jumlahDipilih;
+    document.getElementById('pc_maksBar').textContent = pcCfg.jumlahDipilih;
+    if (!document.getElementById('pc_calonTbody').children.length) {
+      for (var i = 0; i < pcCfg.jumlahDipilih; i++) pcTambahBaris();
+    }
+    pcUpdateCounter();
+  };
+  apiGet('pengaturan').then(function(res){ apply(res.data); }).catch(function(){ apply(DEMO.pengaturan); });
+  pcMuatDaftarKandidat();
+}
+
+document.getElementById('pc_btnLogout').addEventListener('click', function() {
+  pengusulSession = null;
+  loadPencalonan();
+});
+
+/* Isi datalist Nama Calon dari data sheet "Kandidat", dan siapkan lookup NBM/PCM */
+function pcMuatDaftarKandidat() {
+  var render = function(list) {
+    pcDaftarKandidat = list || [];
+    pcKandidatMap = {};
+    pcDaftarKandidat.forEach(function(k) {
+      var key = String(k.nama || '').trim().toLowerCase();
+      if (key) pcKandidatMap[key] = k;
+    });
+    var namaList = [];
+    pcDaftarKandidat.forEach(function(k){ if (k.nama && namaList.indexOf(k.nama) === -1) namaList.push(k.nama); });
+    document.getElementById('pc_kandidatList').innerHTML =
+      namaList.map(function(n){ return '<option value="' + String(n).replace(/"/g,'&quot;') + '">'; }).join('');
+  };
+  apiGet('daftarKandidat').then(function(res){ render(res.data); }).catch(function(){
+    render((DEMO.kandidat || []).map(function(k){ return { nama: k.nama, nbm: k.nbm, pcm: k.asalPcm }; }));
+  });
+}
+
+/* Ketika Nama Calon pada suatu baris cocok dengan data di sheet "Kandidat",
+ * isi otomatis NBM Calon & Asal PCM/Ranting Calon (Riwayat/Alasan tetap diketik Pengusul) */
+function pcIsiOtomatisKandidat(tr) {
+  var nama = tr.querySelector('.pc-nama').value.trim().toLowerCase();
+  if (!nama) return;
+  var found = pcKandidatMap[nama];
+  if (found) {
+    if (found.nbm) tr.querySelector('.pc-nbm').value = found.nbm;
+    if (found.pcm) tr.querySelector('.pc-pcm').value = found.pcm;
+  }
+}
+
+/* Tabel Nama Calon yang Diusulkan (baris dinamis) */
+function pcTambahBaris() {
+  var tr = document.createElement('tr');
+  tr.id = 'pcrow-' + (++pcRowSeq);
+  tr.innerHTML =
+    '<td><input type="text" class="pc-nama" list="pc_kandidatList" autocomplete="off"></td>' +
+    '<td><input type="text" class="pc-nbm"></td>' +
+    '<td><input type="text" class="pc-pcm"></td>' +
+    '<td><textarea class="pc-alasan"></textarea></td>' +
+    '<td class="chk-cell"><input type="checkbox" class="pc-chk"></td>' +
+    '<td><button type="button" class="btn icon" title="Hapus baris">✕</button></td>';
+  document.getElementById('pc_calonTbody').appendChild(tr);
+  tr.querySelector('.pc-nama').addEventListener('change', function(){ pcIsiOtomatisKandidat(tr); });
+  tr.querySelector('.pc-chk').addEventListener('change', function(e){ pcOnCheck(e.target, tr); });
+  tr.querySelector('button.icon').addEventListener('click', function(){ tr.remove(); pcUpdateCounter(); });
+}
+document.getElementById('pc_btnTambahKandidat').addEventListener('click', pcTambahBaris);
+
+function pcOnCheck(chk, tr) {
+  if (chk.checked) {
+    var nama = tr.querySelector('.pc-nama').value.trim();
+    var pcm = tr.querySelector('.pc-pcm').value.trim();
+    if (!nama || !pcm) {
+      chk.checked = false;
+      showMsg('pc_msg', 'Isi Nama Calon dan Asal PCM/Ranting Calon terlebih dahulu sebelum mencentang baris ini.', false);
+      return;
+    }
+  }
+  pcUpdateCounter();
+}
+
+/* Setelah tercentang sejumlah kuota (default 13), kotak ceklis sisanya otomatis nonaktif */
+function pcUpdateCounter() {
+  var checks = Array.prototype.slice.call(document.querySelectorAll('#pc_calonTbody .pc-chk'));
+  var jumlah = checks.filter(function(c){ return c.checked; }).length;
+  document.getElementById('pc_jumlahTerpilih').textContent = jumlah;
+  var penuh = jumlah >= pcCfg.jumlahDipilih;
+  checks.forEach(function(c){ if (!c.checked) c.disabled = penuh; });
+  document.getElementById('pc_btn').disabled = jumlah !== pcCfg.jumlahDipilih;
+}
+
+document.getElementById('pc_btn').addEventListener('click', function() {
+  if (!pengusulSession) { showMsg('pc_msg', 'Sesi login tidak ditemukan, silakan login ulang.', false); return; }
+
+  var rows = Array.prototype.slice.call(document.querySelectorAll('#pc_calonTbody tr'));
+  var calonList = [], tidakLengkap = false;
+  rows.forEach(function(tr) {
+    var chk = tr.querySelector('.pc-chk');
+    if (!chk.checked) return;
+    var nama = tr.querySelector('.pc-nama').value.trim();
+    var pcm = tr.querySelector('.pc-pcm').value.trim();
+    if (!nama || !pcm) { tidakLengkap = true; return; }
+    calonList.push({
+      namaCalon: nama,
+      nbmCalon: tr.querySelector('.pc-nbm').value.trim(),
+      asalPcmCalon: pcm,
+      alasan: tr.querySelector('.pc-alasan').value.trim()
+    });
+  });
+  if (tidakLengkap) { showMsg('pc_msg', 'Ada baris tercentang dengan Nama Calon / Asal PCM/Ranting Calon belum lengkap.', false); return; }
+  if (calonList.length !== pcCfg.jumlahDipilih) {
+    showMsg('pc_msg', 'Usulan harus berisi tepat ' + pcCfg.jumlahDipilih + ' calon tercentang (saat ini ' + calonList.length + ').', false);
+    return;
+  }
+
+  var btn = document.getElementById('pc_btn');
+  btn.disabled = true; btn.textContent = 'Mengirim...';
+  var done = function(res) {
+    btn.textContent = 'Kirim Usulan';
+    showMsg('pc_msg', res.message, res.ok);
+    if (res.ok) {
+      document.getElementById('pc_calonTbody').innerHTML = '';
+      for (var i = 0; i < pcCfg.jumlahDipilih; i++) pcTambahBaris();
+      pcMuatDaftarKandidat();
+    }
+    pcUpdateCounter();
+  };
+  apiPost('pencalonan', { tokenPengusul: pengusulSession.token, calonList: calonList })
+    .then(done)
+    .catch(function() {
+      done({ ok: true, message: '[Mode contoh] Usulan tersimpan secara lokal (tidak dikirim ke spreadsheet karena belum tersambung).' });
+    });
+});
+
+/* ---------- PEMILIHAN ---------- */
+var kandidatList = [], terpilih = {};
+document.getElementById('pm_btnCek').addEventListener('click', function() {
+  var token = document.getElementById('pm_token').value.trim().toUpperCase();
+  if (!token) { showMsg('pm_msgToken', 'Masukkan token terlebih dahulu.', false); return; }
+  var btn = document.getElementById('pm_btnCek');
+  btn.disabled = true; btn.textContent = 'Memeriksa...';
+
+  verifikasiPemilihToken(token).then(function(res) {
+    btn.disabled = false; btn.textContent = 'Verifikasi';
+    if (!res.ok) { showMsg('pm_msgToken', res.message, false); return; }
+    applyPemilihSession(token, res);
+  }).catch(function() {
+    btn.disabled = false; btn.textContent = 'Verifikasi';
+    showMsg('pm_msgToken', '[Mode contoh] Token tidak ditemukan. Coba: PDM-001', false);
+  });
+});
+
+function muatKandidat() {
+  document.getElementById('pm_list').innerHTML = '<p style="font-size:13px;color:#888;">Memuat daftar calon...</p>';
+  var render = function(list) {
+    kandidatList = list;
+    var cont = document.getElementById('pm_list');
+    if (!list.length) { cont.innerHTML = '<p style="font-size:13px;color:#888;">Belum ada calon terverifikasi.</p>'; return; }
+    cont.innerHTML = '';
+    list.forEach(function(k) {
+      var div = document.createElement('div');
+      div.className = 'candidate'; div.id = 'cand-' + k.id;
+      div.innerHTML = '<input type="checkbox" id="chk-' + k.id + '">' +
+        '<div class="info"><b>' + k.nama + '</b><div class="sub">' + k.asalPcm + (k.riwayat ? ' &middot; ' + k.riwayat : '') + '</div></div>';
+      div.addEventListener('click', function(e){
+        if (e.target.tagName !== 'INPUT') document.getElementById('chk-' + k.id).click();
+      });
+      div.querySelector('input').addEventListener('click', function(e){ e.stopPropagation(); toggleCand(k.id); });
+      cont.appendChild(div);
+    });
+  };
+  apiGet('kandidat').then(function(res){ render(res.data); }).catch(function(){ render(DEMO.kandidat); });
+}
+
+function toggleCand(id) {
+  var chk = document.getElementById('chk-' + id), card = document.getElementById('cand-' + id);
+  var maks = pemilihData.maksPilihan;
+  if (chk.checked) {
+    if (Object.keys(terpilih).length >= maks) {
+      chk.checked = false;
+      showMsg('pm_msgVote', 'Anda hanya boleh memilih maksimal ' + maks + ' calon.', false);
+      return;
+    }
+    terpilih[id] = kandidatList.find(function(k){ return k.id === id; });
+    card.classList.add('selected');
+  } else {
+    delete terpilih[id];
+    card.classList.remove('selected');
+  }
+  var jumlah = Object.keys(terpilih).length;
+  document.getElementById('pm_jumlah').textContent = jumlah;
+  document.getElementById('pm_btnKirim').disabled = jumlah === 0;
+}
+
+document.getElementById('pm_btnKirim').addEventListener('click', function() {
+  var pilihan = Object.values(terpilih).map(function(k){ return { id: k.id, nama: k.nama }; });
+  if (!pilihan.length) { showMsg('pm_msgVote', 'Pilih minimal 1 calon.', false); return; }
+  if (!confirm('Kirim ' + pilihan.length + ' pilihan Anda? Suara tidak dapat diubah setelah dikirim.')) return;
+
+  var btn = document.getElementById('pm_btnKirim');
+  btn.disabled = true; btn.textContent = 'Mengirim...';
+  var done = function(res) {
+    if (res.ok) {
+      document.getElementById('pm_voteCard').innerHTML = '<h2>Terima Kasih</h2><p style="font-size:14px;">' + res.message + '</p>';
+      document.getElementById('pm_counterBar').style.display = 'none';
+    } else {
+      btn.disabled = false; btn.textContent = 'Kirim Suara';
+      showMsg('pm_msgVote', res.message, false);
+    }
+  };
+  apiPost('suara', { token: pemilihData.token, namaPemilih: pemilihData.nama, asalPcm: pemilihData.asalPcm, pilihan: pilihan })
+    .then(done)
+    .catch(function(){ done({ ok: true, message: '[Mode contoh] Suara tersimpan secara lokal (tidak dikirim ke spreadsheet karena belum tersambung).' }); });
+});
+
+/* ---------- HASIL ---------- */
+function loadHasil() {
+  document.getElementById('hs_tbody').innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888;">Memuat...</td></tr>';
+  var render = function(list, cfg) {
+    var badge = document.getElementById('hs_badge');
+    if (cfg) { badge.textContent = 'Kuota terpilih: ' + cfg.jumlahDipilih; badge.style.display = 'inline-block'; }
+    var tbody = document.getElementById('hs_tbody');
+    if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888;">Belum ada data.</td></tr>'; return; }
+    tbody.innerHTML = '';
+    list.forEach(function(k, i) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + (i+1) + '</td><td>' + k.nama + '</td><td>' + k.asalPcm + '</td><td>' + k.suara + '</td>';
+      tbody.appendChild(tr);
+    });
+  };
+  apiGet('hasil').then(function(res){ render(res.data, DEMO.pengaturan); }).catch(function(){ render(DEMO.hasil, DEMO.pengaturan); });
+  apiGet('pengaturan').then(function(res){ render0(res.data); }).catch(function(){});
+  function render0(cfg){
+    var badge = document.getElementById('hs_badge');
+    badge.textContent = 'Kuota terpilih: ' + cfg.jumlahDipilih;
+    badge.style.display = 'inline-block';
+  }
+}
+document.getElementById('hs_reload').addEventListener('click', loadHasil);
+
+/* ---------- ADMIN (PANITIA) ---------- */
+function loadAdminPanel() {
+  var renderRingkasan = function(r) {
+    var g = document.getElementById('ad_statGrid');
+    g.children[0].querySelector('b').textContent = r.jumlahKandidat;
+    g.children[1].querySelector('b').textContent = r.totalPemilih;
+    g.children[2].querySelector('b').textContent = r.sudahMemilih;
+    g.children[3].querySelector('b').textContent = r.usulanTercatat;
+    document.getElementById('ad_selPencalonan').value = r.cfg.statusPencalonan;
+    document.getElementById('ad_selPemilihan').value = r.cfg.statusPemilihan;
+  };
+  apiPost('adminRingkasan', { token: adminToken }).then(function(res){ renderRingkasan(res.data); })
+    .catch(function(){ renderRingkasan({ jumlahKandidat: DEMO.kandidat.length, totalPemilih: 1, sudahMemilih: 0, usulanTercatat: DEMO.usulan.length, cfg: DEMO.pengaturan }); });
+
+  var renderUsulan = function(list) {
+    var cont = document.getElementById('ad_listUsulan');
+    if (!list.length) { cont.innerHTML = '<p style="font-size:13px;color:#888;">Tidak ada usulan baru.</p>'; return; }
+    cont.innerHTML = '';
+    list.forEach(function(u) {
+      var div = document.createElement('div');
+      div.className = 'usulan-item';
+      div.innerHTML =
+        '<b>' + u.namaCalon + '</b> <span class="status">' + u.status + '</span><br>' +
+        '<span style="color:#666;">Asal: ' + u.asalPcmCalon + ' &middot; Diusulkan oleh: ' + u.namaPengusul +
+        ' (' + (u.kategoriPengusul || '-') + ', ' + (u.asalPcmOrtomPengusul || '-') + ')</span><br>' +
+        (u.alasan ? '<span style="color:#666;">Alasan: ' + u.alasan + '</span><br>' : '') +
+        (u.status === 'Baru' ?
+          '<button class="btn small" data-act="Diterima" data-id="' + u.id + '">✓ Terima</button>' +
+          '<button class="btn small danger" data-act="Ditolak" data-id="' + u.id + '">✕ Tolak</button>'
+          : '');
+      cont.appendChild(div);
+    });
+    cont.querySelectorAll('button[data-act]').forEach(function(b) {
+      b.addEventListener('click', function() {
+        apiPost('adminVerifikasiCalon', { token: adminToken, idUsulan: b.dataset.id, keputusan: b.dataset.act })
+          .then(function(){ loadAdminPanel(); })
+          .catch(function(){ alert('[Mode contoh] Aksi ini butuh koneksi ke spreadsheet asli.'); });
+      });
+    });
+  };
+  apiPost('adminListUsulan', { token: adminToken }).then(function(res){ renderUsulan(res.data); })
+    .catch(function(){ renderUsulan(DEMO.usulan); });
+}
+
+function simpanStatus(field, selId) {
+  var value = document.getElementById(selId).value;
+  apiPost('adminSetStatus', { token: adminToken, field: field, value: value })
+    .then(function(res){ showMsg('ad_msgStatus', res.ok ? 'Status berhasil disimpan.' : res.message, res.ok); loadAdminPanel(); })
+    .catch(function(){ showMsg('ad_msgStatus', '[Mode contoh] Perubahan tidak disimpan (belum tersambung ke spreadsheet).', true); });
+}
+document.getElementById('ad_simpanPencalonan').addEventListener('click', function(){ simpanStatus('Status Pencalonan', 'ad_selPencalonan'); });
+document.getElementById('ad_simpanPemilihan').addEventListener('click', function(){ simpanStatus('Status Pemilihan', 'ad_selPemilihan'); });
+</script>
 </body>
 </html>
