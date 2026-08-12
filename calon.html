@@ -84,6 +84,8 @@
   .hdr-cd-box .lbl{font-size:9.5px;color:#eafff0;}
   @media (max-width:640px){ .hdr-inner{flex-direction:column;} .hdr-countdown{text-align:left;} .hdr-right{flex-direction:column;} }.token-warning{margin:8px 0 4px;font-size:11.5px;line-height:1.55;color:#7a4a00;background:#fff6e0;border:1px solid #f0d896;border-radius:8px;padding:10px 12px;}
   .token-warning b{color:#a02b2b;}
+.email-notice{margin:8px 0 4px;font-size:11.5px;line-height:1.55;color:#1f6f3f;background:#eaf7ee;border:1px solid #b9e3c6;border-radius:8px;padding:10px 12px;}
+  .email-notice b{color:#1f6f3f;}
 </style>
 </head>
 <body>
@@ -211,6 +213,7 @@ var CONFIG = {
       <label>Nama Lengkap *</label><input type="text" id="dm_ang_nama">
       <input type="hidden" id="dm_ang_asal" value="PDM Kab. Malang">
       <label>Email Aktif *</label><input type="email" id="dm_ang_email">
+      <div class="email-notice"><b>Perhatian!...</b> sistem Aplikasi secara Otomatis akan mengirimkan Token ke alamat Email Anda, setelah terverifikasi.</div>
       <label>No HP/WhatsApp Aktif *</label><input type="tel" id="dm_ang_hp">
       <button class="btn secondary" id="dm_ang_btnKirim">Kirim</button>
       <div class="msg" id="dm_ang_msg"></div>
@@ -235,6 +238,7 @@ var CONFIG = {
         <option value="">-- pilih PCM --</option>
       </select>
       <label>Email Aktif *</label><input type="email" id="dm_ket_email">
+      <div class="email-notice"><b>Perhatian!...</b> sistem Aplikasi secara Otomatis akan mengirimkan Token ke alamat Email Anda, setelah terverifikasi.</div>
       <label>No HP/WhatsApp Aktif *</label><input type="tel" id="dm_ket_hp">
       <button class="btn secondary" id="dm_ket_btnKirim">Kirim</button>
       <div class="msg" id="dm_ket_msg"></div>
@@ -278,6 +282,7 @@ var CONFIG = {
       <label>Nama Lengkap *</label><input type="text" id="dm_ort_nama">
       <input type="hidden" id="dm_ort_asal">
       <label>Email Aktif *</label><input type="email" id="dm_ort_email">
+      <div class="email-notice"><b>Perhatian!...</b> sistem Aplikasi secara Otomatis akan mengirimkan Token ke alamat Email Anda, setelah terverifikasi.</div>
       <label>No HP/WhatsApp Aktif *</label><input type="tel" id="dm_ort_hp">
       <button class="btn secondary" id="dm_ort_btnKirim">Kirim</button>
       <div class="msg" id="dm_ort_msg"></div>
@@ -337,6 +342,7 @@ var CONFIG = {
       </div>
       <input type="hidden" id="dm_pem_asal">
       <label>Email Aktif *</label><input type="email" id="dm_pem_email">
+      <div class="email-notice"><b>Perhatian!...</b> sistem Aplikasi secara Otomatis akan mengirimkan Token ke alamat Email Anda, setelah terverifikasi.</div>
       <label>No HP/WhatsApp Aktif *</label><input type="tel" id="dm_pem_hp">
       <button class="btn secondary" id="dm_pem_btnKirim">Kirim</button>
       <div class="msg" id="dm_pem_msg"></div>
