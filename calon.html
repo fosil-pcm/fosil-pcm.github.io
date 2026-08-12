@@ -51,8 +51,6 @@
   table.result textarea{min-height:40px;resize:vertical;}
   td.chk-cell{text-align:center;}
   td.chk-cell input[type=checkbox]{width:18px;height:18px;}
-  button.btn.icon{background:none;border:none;color:#a02b2b;font-size:15px;cursor:pointer;padding:4px 6px;line-height:1;}
-  button.btn.icon:hover{color:#6e1c1c;}
   .stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px;}
   .stat{background:#f1f9f2;border-radius:10px;padding:14px;text-align:center;}
   .stat b{display:block;font-size:22px;color:var(--hijau-tua);}
@@ -383,14 +381,11 @@ var CONFIG = {
               <th style="min-width:140px;">Asal PCM/Ranting Calon</th>
               <th style="min-width:180px;">Riwayat Organisasi / Alasan Pengusulan</th>
               <th style="text-align:center;">Pilih</th>
-              <th></th>
             </tr>
           </thead>
           <tbody id="pc_calonTbody"></tbody>
         </table>
       </div>
-      <button type="button" class="btn secondary small" id="pc_btnTambahKandidat" style="margin-top:8px;">+ Tambah Kandidat</button>
-
       <div class="counter" style="position:static;border:1px solid var(--border);border-radius:8px;margin-top:14px;">
         Tercentang: <b id="pc_jumlahTerpilih">0</b> / <span id="pc_maksBar">13</span>
       </div>
@@ -1107,7 +1102,7 @@ function pcIsiOtomatisKandidat(tr) {
   }
 }
 
-/* Tabel Nama Calon yang Diusulkan (baris dinamis) */
+/* Tabel Nama Calon yang Diusulkan (baris tetap, jumlah baris = kuota calon) */
 function pcTambahBaris() {
   var tr = document.createElement('tr');
   tr.id = 'pcrow-' + (++pcRowSeq);
@@ -1116,14 +1111,11 @@ function pcTambahBaris() {
     '<td><input type="text" class="pc-nbm"></td>' +
     '<td><input type="text" class="pc-pcm"></td>' +
     '<td><textarea class="pc-alasan"></textarea></td>' +
-    '<td class="chk-cell"><input type="checkbox" class="pc-chk"></td>' +
-    '<td><button type="button" class="btn icon" title="Hapus baris">✕</button></td>';
+    '<td class="chk-cell"><input type="checkbox" class="pc-chk"></td>';
   document.getElementById('pc_calonTbody').appendChild(tr);
   tr.querySelector('.pc-nama').addEventListener('change', function(){ pcIsiOtomatisKandidat(tr); });
   tr.querySelector('.pc-chk').addEventListener('change', function(e){ pcOnCheck(e.target, tr); });
-  tr.querySelector('button.icon').addEventListener('click', function(){ tr.remove(); pcUpdateCounter(); });
 }
-document.getElementById('pc_btnTambahKandidat').addEventListener('click', pcTambahBaris);
 
 function pcOnCheck(chk, tr) {
   if (chk.checked) {
