@@ -75,8 +75,9 @@
   .hdr-logo{height:56px;width:auto;opacity:.95;}
   .hdr-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;}
   .hdr-right{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;}
-  .hdr-idle-warning{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:8px;padding:6px 10px;font-size:11px;color:#eafff0;max-width:180px;line-height:1.4;text-align:left;}
+  .hdr-idle-warning{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:8px;padding:6px 10px;font-size:11px;color:#eafff0;max-width:190px;line-height:1.4;text-align:left;}
   .hdr-idle-warning .ico{font-size:15px;flex-shrink:0;}
+  .hdr-idle-warning .cd{font-weight:700;color:#fff;font-variant-numeric:tabular-nums;}
   .hdr-countdown{text-align:right;}
   .hdr-countdown-date{font-size:12px;color:#eafff0;margin-top:6px;}
   .hdr-countdown-timer{display:flex;gap:8px;}
@@ -111,7 +112,7 @@ var CONFIG = {
     <div class="hdr-right">
       <div class="hdr-idle-warning" id="hm_idleWarning">
         <span class="ico">&#9201;</span>
-        <span>Sesi otomatis <b>NON AKTIF</b> jika 90 menit tidak ada aktivitas.</span>
+        <span>Sesi otomatis <b>NON AKTIF</b> dalam <span class="cd" id="hm_idleCountdown">90:00</span> jika tidak ada aktivitas.</span>
       </div>
       <div class="hdr-countdown">
         <div class="hdr-countdown-timer" id="hm_countdownTimer">
@@ -1612,25 +1613,41 @@ document.getElementById('au_pem_btnTambah').addEventListener('click', function()
  * Pemilih/Utusan) otomatis diakhiri dan aplikasi kembali ke halaman Login.
  * ===================================================================== */
 var IDLE_LIMIT_MS_ = 90 * 60 * 1000; // 90 menit
-var idleTimer_ = null;
+var idleDeadline_ = Date.now() + IDLE_LIMIT_MS_;
+var idleDisplayInterval_ = null;
+
+function idleFormatMMSS_(ms) {
+  if (ms < 0) ms = 0;
+  var totalSec = Math.floor(ms / 1000);
+  var mm = Math.floor(totalSec / 60);
+  var ss = totalSec % 60;
+  return (mm < 10 ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+}
 function idleResetSemuaSesi_() {
   var adaSesiAktif = !!(adminToken || pengusulSession || pemilihData);
   adminToken = null;
   pengusulSession = null;
   pemilihData = null;
   goPage('login');
+  idleDeadline_ = Date.now() + IDLE_LIMIT_MS_;
   if (adaSesiAktif) {
     alert('Sesi Anda telah diakhiri secara otomatis karena tidak ada aktivitas selama 90 menit. Silakan login kembali.');
   }
 }
-function idleResetTimer_() {
-  if (idleTimer_) clearTimeout(idleTimer_);
-  idleTimer_ = setTimeout(idleResetSemuaSesi_, IDLE_LIMIT_MS_);
+function idleTick_() {
+  var sisa = idleDeadline_ - Date.now();
+  var el = document.getElementById('hm_idleCountdown');
+  if (el) el.textContent = idleFormatMMSS_(sisa);
+  if (sisa <= 0) idleResetSemuaSesi_();
+}
+function idleBumpActivity_() {
+  idleDeadline_ = Date.now() + IDLE_LIMIT_MS_;
 }
 ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(function(evt) {
-  document.addEventListener(evt, idleResetTimer_, { passive: true });
+  document.addEventListener(evt, idleBumpActivity_, { passive: true });
 });
-idleResetTimer_();
+idleDisplayInterval_ = setInterval(idleTick_, 1000);
+idleTick_();
 </script>
 </body>
 </html>
