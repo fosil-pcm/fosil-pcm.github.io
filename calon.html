@@ -209,9 +209,6 @@ var CONFIG = {
         Aplikasi ini digunakan untuk proses <b>pencalonan</b> dan <b>pemilihan</b> Anggota
         Pimpinan Daerah Muhammadiyah (PDM) Kabupaten Malang pada Musyawarah Daerah (Musyda).
       </p>
-      <div class="menu-grid" style="grid-template-columns:1fr;">
-        <div class="menu-item" data-page="hasil"><span class="ico">📊</span>Hasil Perolehan Suara</div>
-      </div>
     </div>
     <div class="card">
       <h2>Statistik</h2>
@@ -223,9 +220,18 @@ var CONFIG = {
       </div>
     </div>
     <div class="card">
-      <h2>Diagram Pencalonan</h2>
+      <h2>Daftar Calon (Sementara) Pimpinan Daerah Muhammadiyah Kabupaten Malang 2027-2032</h2>
       <p style="font-size:12px;color:#888;margin-top:-8px;">Nama calon dan persentase Token (Anggota PDM/Ketua PCM/ORTOM) yang mengusulkannya, dari seluruh Token yang sudah mengirim Formulir Pencalonan.</p>
       <div id="hm_diagramCalon"><p class="tbl-note" style="padding:6px 0;">Memuat...</p></div>
+    </div>
+    <div class="card">
+      <h2>DAFTAR CALON (TETAP) PIMPINAN DAERAH MUHAMMADIYAH KABUPATEN MALANG 2027-2032</h2>
+      <div class="table-wrap">
+        <table class="result">
+          <thead><tr><th style="width:44px;">No</th><th>Nama Calon</th><th>Asal Calon</th></tr></thead>
+          <tbody id="hm_calonTetap"><tr><td colspan="3" class="tbl-note">Memuat...</td></tr></tbody>
+        </table>
+      </div>
     </div>
     <div class="card">
       <h2>Informasi Musyda Muhammadiyah Kabupaten Malang</h2>
@@ -543,7 +549,7 @@ var CONFIG = {
       <p style="font-size:12.5px;color:#7a4a00;background:#fff6e0;border:1px solid #f0d896;border-radius:8px;padding:10px 12px;line-height:1.5;">
         Formulir Pencalonan hanya dapat dikirim <b>1 (satu) kali</b> untuk setiap Token. Usulan Anda di bawah ini sudah tersimpan dan tidak dapat diubah/dikirim ulang. Hubungi panitia jika ada koreksi.
       </p>
-      <button type="button" class="btn small" id="pt_btnPdf" style="display:none;margin-bottom:12px;">🖨️ Download/Cetak PDF Usulan (Kop PCM)</button>
+      <button type="button" class="btn small" id="pt_btnPdf" style="display:none;margin-bottom:12px;">🖨️ Download/Cetak PDF Usulan</button>
       <div class="table-wrap">
         <table class="result">
           <thead><tr><th>No</th><th>Nama Calon</th><th>Asal Calon</th><th>Riwayat/Alasan</th><th>Status</th></tr></thead>
@@ -802,6 +808,7 @@ var CONFIG = {
       <div class="card">
         <h2>Verifikasi Usulan Calon</h2>
         <p style="font-size:12px;color:#888;margin-top:-8px;">Daftar calon yang diusulkan Pengusul (Anggota PDM, Ketua PCM, ORTOM) — 1 baris per calon (bukan per Token). Kolom "Pengusul" hanya menampilkan Token, identitas &amp; alasan pengusul dirahasiakan dari Panitia. Klik "Terima" atau "Tolak" untuk memverifikasi usulan berstatus "Baru".</p>
+        <button type="button" class="btn small" id="ad_btnPdfCalon" style="display:none;margin-bottom:12px;">🖨️ Download/Cetak PDF Calon</button>
         <div class="table-wrap">
           <table class="result">
             <thead><tr><th>Waktu</th><th>Nama Calon</th><th>Asal Calon</th><th>Jumlah</th><th>Pengusul (Token)</th><th>Status</th><th>Aksi</th></tr></thead>
@@ -1143,6 +1150,16 @@ function loadHome() {
   };
   apiGetCached('statistikCalon', null, 15000).then(function(res){ renderDiagram(res.data); })
     .catch(function(){ document.getElementById('hm_diagramCalon').innerHTML = '<p class="tbl-note err" style="padding:6px 0;">' + PESAN_GAGAL_KONEKSI + '</p>'; });
+
+  var renderCalonTetap = function(list) {
+    var tb = document.getElementById('hm_calonTetap');
+    if (!list || !list.length) { tb.innerHTML = '<tr><td colspan="3" class="tbl-note">Belum ada Calon (Tetap).</td></tr>'; return; }
+    tb.innerHTML = list.map(function(k, i) {
+      return '<tr><td>' + (i + 1) + '</td><td>' + pcEsc_(k.nama) + '</td><td>' + pcEsc_(k.asalPcm || '-') + '</td></tr>';
+    }).join('');
+  };
+  apiGetCached('kandidat', null, 15000).then(function(res){ renderCalonTetap(res.data); })
+    .catch(function(){ document.getElementById('hm_calonTetap').innerHTML = '<tr><td colspan="3" class="tbl-note err">' + PESAN_GAGAL_KONEKSI + '</td></tr>'; });
 }
 loadHome();
 
@@ -1800,7 +1817,7 @@ function pcRenderTerkirim() {
   document.getElementById('pt_idKategori').textContent = pengusulSession.kategori;
   document.getElementById('pt_idAsal').textContent = pengusulSession.asalPcmOrtom || '-';
   document.getElementById('pt_idHp').textContent = pengusulSession.hp || '-';
-  document.getElementById('pt_btnPdf').style.display = (/PCM/i.test(String(pengusulSession.kategori))) ? '' : 'none';
+  document.getElementById('pt_btnPdf').style.display = (/PCM|PDM/i.test(String(pengusulSession.kategori))) ? '' : 'none';
   document.getElementById('pt_tanggal').textContent = (u && u.tanggal) ? new Date(u.tanggal).toLocaleString('id-ID') : '-';
 
   var tbody = document.getElementById('pt_tbody');
@@ -1809,7 +1826,7 @@ function pcRenderTerkirim() {
   tbody.innerHTML = '';
   list.forEach(function(c, i) {
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + c.namaCalon + '</td><td>' + c.asalPcmCalon + '</td><td>' + (c.alasan || '-') + '</td><td>' + (c.status || '-') + '</td>';
+    tr.innerHTML = '<td>' + (i + 1) + '</td><td>' + c.namaCalon + '</td><td>' + c.asalPcmCalon + '</td><td>' + (c.alasan || '-') + '</td><td>' + (String(c.status || '').trim().toLowerCase() === 'baru' ? 'Diusulkan' : (c.status || '-')) + '</td>';
     tbody.appendChild(tr);
   });
 }
@@ -1830,15 +1847,19 @@ function buatPdfUsulanPcm_(jsPDF, s) {
   var doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
   doc.addFileToVFS('LTInternet-Bold.ttf', FONT_LTINTERNET_B64);
   doc.addFont('LTInternet-Bold.ttf', 'LTInternet', 'bold');
-  var L = 20, R = 190, W = R - L, BAWAH = 270, namaKop = namaPcmKop_(s.asalPcmOrtom);
+  var L = 20, R = 190, W = R - L, BAWAH = 270, namaKop = namaPcmKop_(s.asalPcmOrtom), isPdm = (s.jenis === 'PDM');
   var kolom = [['No', 10], ['Nama Calon', 52], ['Asal Calon', 34], ['Riwayat/Alasan', 52], ['Status', 22]];
   function halaman(baru) {
     if (baru) doc.addPage();
-    doc.addImage(KOP_PCM_JPG, 'JPEG', 0, 0, 210, 297);
-    doc.setFont('LTInternet', 'bold'); doc.setFontSize(20.5); // sama dengan ukuran tulisan "Pimpinan Cabang Muhammadiyah" pada kop
-    var w = doc.getTextWidth(namaKop), ukuran = w > 150 ? Math.max(12, 20.5 * 150 / w) : 20.5;
-    doc.setFontSize(ukuran); doc.setTextColor(44, 60, 143);
-    doc.text(namaKop, 42.5, 29.5); // baris ke-2 kop, tepat di bawah "PIMPINAN CABANG MUHAMMADIYAH"
+    if (isPdm) {
+      doc.addImage(KOP_UNDANGAN_JPG, 'JPEG', 0, 0, 210, 297); // kop resmi PDM (sudah lengkap, tanpa teks tambahan)
+    } else {
+      doc.addImage(KOP_PCM_JPG, 'JPEG', 0, 0, 210, 297);
+      doc.setFont('LTInternet', 'bold'); doc.setFontSize(20.5); // sama dengan ukuran tulisan "Pimpinan Cabang Muhammadiyah" pada kop
+      var w = doc.getTextWidth(namaKop), ukuran = w > 150 ? Math.max(12, 20.5 * 150 / w) : 20.5;
+      doc.setFontSize(ukuran); doc.setTextColor(44, 60, 143);
+      doc.text(namaKop, 42.5, 29.5); // baris ke-2 kop, tepat di bawah "PIMPINAN CABANG MUHAMMADIYAH"
+    }
     doc.setTextColor(0); doc.setFont('times', 'normal'); doc.setFontSize(11);
   }
   function headTabel(y) {
@@ -1856,14 +1877,14 @@ function buatPdfUsulanPcm_(jsPDF, s) {
   doc.text('MUHAMMADIYAH KABUPATEN MALANG' + (s.periode ? ' PERIODE ' + s.periode : ''), 105, y + 6, { align: 'center' });
   y += 16;
   doc.setFont('times', 'normal'); doc.setFontSize(11);
-  [['Pengusul', s.nama], ['Unsur', 'PCM ' + (s.asalPcmOrtom || '-')], ['No HP', s.hp || '-'], ['Dikirim', s.tanggal || '-']].forEach(function(r) {
+  [['Pengusul', s.nama], ['Unsur', isPdm ? 'Anggota PDM' : 'PCM ' + (String(s.asalPcmOrtom || '').replace(/^\s*(PCM|Pimpinan Cabang Muhammadiyah)\s+/i, '').trim() || '-')], ['No HP', s.hp || '-'], ['Dikirim', s.tanggal || '-']].forEach(function(r) {
     doc.text(r[0], L, y); doc.text(': ' + r[1], L + 24, y); y += 5.8;
   });
   y += 4;
   y = headTabel(y);
   doc.setLineHeightFactor(1.25);
   s.calonList.forEach(function(c, i) {
-    var sel = [String(i + 1), String(c.namaCalon || '-'), String(c.asalPcmCalon || '-'), String(c.alasan || '-'), String(c.status || '-')];
+    var sel = [String(i + 1), String(c.namaCalon || '-'), String(c.asalPcmCalon || '-'), String(c.alasan || '-'), String(String(c.status || '').trim().toLowerCase() === 'baru' ? 'Diusulkan' : (c.status || '-'))];
     var potong = sel.map(function(t, k) { return doc.splitTextToSize(t, kolom[k][1] - 4); });
     var baris = Math.max.apply(null, potong.map(function(p) { return p.length; }));
     var tinggi = baris * 4.6 + 3.4;
@@ -1888,6 +1909,65 @@ function buatPdfUsulanPcm_(jsPDF, s) {
   doc.setLineWidth(0.3); doc.line(150 - lw / 2, y + 33, 150 + lw / 2, y + 33);
   return doc;
 }
+/* ---------- PDF "Calon" (Panel Panitia > Verifikasi Usulan Calon): HANYA calon berstatus "Diterima", kop PDM ---------- */
+var adCalonDiterima = [];
+function buatPdfCalonDiterima_(jsPDF, list, periode) {
+  var doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  var L = 20, R = 190, W = R - L, BAWAH = 270;
+  var kolom = [['No', 12], ['Nama Calon', 78], ['Asal Calon', 60], ['Usulan', 20]];
+  function halaman(baru) {
+    if (baru) doc.addPage();
+    doc.addImage(KOP_UNDANGAN_JPG, 'JPEG', 0, 0, 210, 297);
+    doc.setTextColor(0); doc.setFont('times', 'normal'); doc.setFontSize(11);
+  }
+  function headTabel(y) {
+    var x = L;
+    doc.setFont('times', 'bold'); doc.setFontSize(10.5); doc.setFillColor(230, 236, 232);
+    doc.rect(L, y, W, 8, 'FD');
+    kolom.forEach(function(k) { doc.text(k[0], x + 2, y + 5.4); x += k[1]; });
+    doc.setFont('times', 'normal'); doc.setFontSize(10.5);
+    return y + 8;
+  }
+  halaman(false);
+  var y = 50;
+  doc.setFont('times', 'bold'); doc.setFontSize(13);
+  doc.text('DAFTAR CALON PIMPINAN DAERAH', 105, y, { align: 'center' });
+  doc.text('MUHAMMADIYAH KABUPATEN MALANG' + (periode ? ' PERIODE ' + periode : ''), 105, y + 6, { align: 'center' });
+  y += 16;
+  y = headTabel(y);
+  doc.setLineHeightFactor(1.25);
+  list.forEach(function(c, i) {
+    var sel = [String(i + 1), String(c.namaCalon || '-'), String(c.asalPcmCalon || '-'), String(c.jumlahToken == null ? '-' : c.jumlahToken)];
+    var potong = sel.map(function(t, k) { return doc.splitTextToSize(t, kolom[k][1] - 4); });
+    var baris = Math.max.apply(null, potong.map(function(p) { return p.length; }));
+    var tinggi = baris * 4.6 + 3.4;
+    if (y + tinggi > BAWAH) { halaman(true); y = headTabel(50); }
+    var x = L;
+    doc.setDrawColor(150); doc.setLineWidth(0.2); doc.rect(L, y, W, tinggi);
+    potong.forEach(function(p, k) {
+      if (k > 0) doc.line(x, y, x, y + tinggi);
+      doc.text(p, x + 2, y + 5);
+      x += kolom[k][1];
+    });
+    y += tinggi;
+  });
+  return doc;
+}
+document.getElementById('ad_btnPdfCalon').addEventListener('click', function() {
+  var btn = this, teksAsli = btn.textContent;
+  if (!adCalonDiterima.length) return;
+  btn.disabled = true; btn.textContent = '⏳ Membuat PDF…';
+  var tab = window.open('', '_blank'); // dibuka sinkron agar tidak diblokir popup-blocker
+  muatJsPdf_().then(function(jsPDF) {
+    var doc = buatPdfCalonDiterima_(jsPDF, adCalonDiterima, (typeof pcCfg !== 'undefined' && pcCfg && pcCfg.periode) || '');
+    var url = URL.createObjectURL(doc.output('blob'));
+    if (tab) { tab.location.href = url; } else { doc.save('Daftar Calon Diterima.pdf'); }
+  }).catch(function(err) {
+    if (tab) { try { tab.close(); } catch (e) {} }
+    alert((err && err.message) || 'Gagal membuat PDF.');
+  }).then(function() { btn.disabled = false; btn.textContent = teksAsli; });
+});
+
 document.getElementById('pt_btnPdf').addEventListener('click', function() {
   var btn = this, teksAsli = btn.textContent;
   if (!pengusulSession || !pengusulSession.usulan) return;
@@ -1895,6 +1975,7 @@ document.getElementById('pt_btnPdf').addEventListener('click', function() {
   var tab = window.open('', '_blank'); // dibuka sinkron agar tidak diblokir popup-blocker
   var u = pengusulSession.usulan;
   var data = {
+    jenis: /PDM/i.test(String(pengusulSession.kategori)) ? 'PDM' : 'PCM',
     nama: pengusulSession.nama, asalPcmOrtom: pengusulSession.asalPcmOrtom, hp: pengusulSession.hp,
     periode: pcCfg.periode || '', calonList: u.calonList || [],
     tanggal: u.tanggal ? new Date(u.tanggal).toLocaleString('id-ID') : ''
@@ -1902,7 +1983,7 @@ document.getElementById('pt_btnPdf').addEventListener('click', function() {
   muatJsPdf_().then(function(jsPDF) {
     var doc = buatPdfUsulanPcm_(jsPDF, data);
     var url = URL.createObjectURL(doc.output('blob'));
-    if (tab) { tab.location.href = url; } else { doc.save('Usulan Calon PCM ' + (data.asalPcmOrtom || '') + '.pdf'); }
+    if (tab) { tab.location.href = url; } else { doc.save(data.jenis === 'PDM' ? 'Usulan Calon Anggota PDM ' + (data.nama || '') + '.pdf' : 'Usulan Calon PCM ' + (data.asalPcmOrtom || '') + '.pdf'); }
   }).catch(function(err) {
     if (tab) { try { tab.close(); } catch (e) {} }
     alert((err && err.message) || 'Gagal membuat PDF.');
@@ -2340,6 +2421,9 @@ function loadAdminPanel() {
   };
   var renderUsulan = function(list) {
     var cont = document.getElementById('ad_listUsulan');
+    // PDF Calon: HANYA untuk usulan berstatus "Diterima"
+    adCalonDiterima = (list || []).filter(function(u) { return u.status === 'Diterima'; });
+    document.getElementById('ad_btnPdfCalon').style.display = adCalonDiterima.length ? '' : 'none';
     if (!list.length) { cont.innerHTML = '<tr><td colspan="7" class="tbl-note">Tidak ada usulan baru.</td></tr>'; return; }
     cont.innerHTML = '';
     list.forEach(function(u) {
