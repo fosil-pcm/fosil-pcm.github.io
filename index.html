@@ -572,6 +572,30 @@ function accessOf_(sec) {
   if (sec === 'verifikasi') return (currentUser && (currentUser.role === 'Admin PDM' || (currentUser.role === 'Pimpinan Cabang' && currentUser.idCabang) || (currentUser.role === 'Pimpinan Ranting' && currentUser.idRanting))) ? 'edit' : 'none';
   return (currentUser && currentUser.access && currentUser.access[sec]) || 'none';
 }
+// Siapa yang boleh MENAMBAH data baru (cermin ADD_ROLES di Code.gs; server tetap memeriksa ulang).
+const ADD_ROLES = {
+  cabang:  ['Admin PDM'],
+  ranting: ['Admin PDM', 'Pimpinan Cabang'],
+  aum:     ['Admin PDM'],
+  sdm:     ['Admin PDM', 'Pimpinan Cabang', 'Pimpinan Ranting'],
+  sda:     ['Admin PDM', 'Pimpinan Cabang', 'Pimpinan Ranting'],
+  ekonomi: ['Admin PDM', 'Pimpinan Cabang', 'Pimpinan Ranting']
+};
+function canAddModule_(sec) {
+  if (accessOf_(sec) !== 'edit' || !currentUser) return false;
+  const roles = ADD_ROLES[sec];
+  if (!roles) return true;
+  if (roles.indexOf(currentUser.role) < 0) return false;
+  if (currentUser.role === 'Pimpinan Cabang') return !!currentUser.idCabang;
+  if (currentUser.role === 'Pimpinan Ranting') return !!currentUser.idRanting;
+  return true;
+}
+// Panel form tampil bila boleh menambah, atau sedang mengedit data yang boleh diubah.
+function syncFormPanel_(sec) {
+  const t = document.getElementById('formTitle-' + sec);
+  if (!t) return;
+  t.closest('.panel').classList.toggle('hidden', !(accessOf_(sec) === 'edit' && (canAddModule_(sec) || currentEditId[sec])));
+}
 // Menu yang boleh dilihat tanpa login (dan oleh siapa pun yang login, apa pun hak aksesnya).
 // Tombol Tambah & kolom Aksi tetap otomatis hilang di menu ini untuk yang bukan 'edit' (termasuk tamu),
 // karena itu sudah diatur lewat accessOf_() di tempat lain.
@@ -953,7 +977,7 @@ function showSection(sec) {
   } else {
     document.getElementById('pageTitle').textContent = sec === 'user' ? 'Config' : MODULES[sec].title;
     document.getElementById('pageDesc').textContent = MODULES[sec].desc;
-    document.getElementById('formTitle-' + sec).closest('.panel').classList.toggle('hidden', accessOf_(sec) !== 'edit');   // role 'lihat saja' tanpa form
+    syncFormPanel_(sec);   // form hanya tampil untuk yang boleh menambah (atau sedang mengedit)
     if (sec === 'anggota') {
       document.getElementById('guestPanel-anggota').classList.toggle('hidden', !isGuestView_('anggota'));
       fillGuestCabang_();
@@ -1271,6 +1295,7 @@ function editRow(modKey, rowJsonStr) {
   const row = JSON.parse(rowJsonStr);
   const mod = MODULES[modKey];
   currentEditId[modKey] = row[mod.idField];
+  syncFormPanel_(modKey);
   document.getElementById('formTitle-' + modKey).textContent = 'Edit ' + mod.title + ' — ' + row[mod.idField];
   mod.fields.forEach(function (f) {
     const el = document.getElementById(`field-${modKey}-${cssKey(f.key)}`);
@@ -1309,6 +1334,7 @@ function editRow(modKey, rowJsonStr) {
 function resetForm(modKey) {
   const mod = MODULES[modKey];
   currentEditId[modKey] = null;
+  syncFormPanel_(modKey);
   document.getElementById('formTitle-' + modKey).textContent = 'Tambah ' + mod.title;
   mod.fields.forEach(function (f) {
     const el = document.getElementById(`field-${modKey}-${cssKey(f.key)}`);
